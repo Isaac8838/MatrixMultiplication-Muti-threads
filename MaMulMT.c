@@ -6,15 +6,15 @@
 #define MAX 500
 #define MAX_Threads 100
 
-int raw, col;
+int row, col;
 double matrixA[MAX][MAX], matrixB[MAX][MAX], matrixC[MAX][MAX];
 
 void *mul(void *arg) {
     int index = *((int *)arg);
-    int block = raw / MAX_Threads;
+    int block = row / MAX_Threads;
     for (int i = index; i < index + block; i++) {
         for (int j = 0; j < col; j++) {
-            for (int k = 0; k < raw; k++) {
+            for (int k = 0; k < row; k++) {
                 matrixC[i][j] += matrixA[i][k] * matrixB[k][j];
             }
         }
@@ -45,14 +45,14 @@ int main() {
             printf("%s\n", inFileName);
         }
 
-        // read raw and col
-        fscanf(inFile, "%d", &raw);
+        // read row and col
+        fscanf(inFile, "%d", &row);
         fscanf(inFile, "%d", &col);
 
         printf("%d\n", c);
 
         // initiate matrixs
-        for (int i = 0; i < raw; i++) {
+        for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 fscanf(inFile, "%f", &val);
                 matrixA[i][j] = matrixB[i][j] = val;
@@ -61,7 +61,7 @@ int main() {
         }
 
         // create 500 threads and calculate matrixC
-        int block = raw / MAX_Threads;
+        int block = row / MAX_Threads;
         for (int i = 0; i < MAX_Threads; i++) {
             int *index = malloc(sizeof(int));
             *index = i * block;
@@ -84,8 +84,8 @@ int main() {
         }
 
         // write matrixC val
-        fprintf(outFile, "%d\n%d\n", raw, col);
-        for (int i = 0; i < raw; i++) {
+        fprintf(outFile, "%d\n%d\n", row, col);
+        for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 fprintf(outFile, "%f\n", matrixC[i][j]);
             }
