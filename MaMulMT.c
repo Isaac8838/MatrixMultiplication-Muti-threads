@@ -28,7 +28,7 @@ int main() {
 
     gettimeofday(&tp_s, &tzp_s);
 
-    for (int c = 1; c <= 1; c++) {
+    for (int c = 1; c <= 1000; c++) {
 
         // name inFileName and outFileName
         sprintf(inFileName, "in/in%d.txt", c);
@@ -58,7 +58,7 @@ int main() {
 
         // create 500 threads and calculate matrixC
         for (int i = 0; i < row; i++) {
-            int *index = malloc(sizeof(int));
+            int *index = (int*)malloc(sizeof(int));
             *index = i;
             if (pthread_create(&th[i], NULL, &mul, index) != 0) {
                 perror("Faild to create thread");
