@@ -4,19 +4,15 @@
 #include <pthread.h>
 #include <sys/time.h>
 #define MAX 500
-#define MAX_Threads 100
 
 int row, col;
 double matrixA[MAX][MAX], matrixB[MAX][MAX], matrixC[MAX][MAX];
 
 void *mul(void *arg) {
     int index = *((int *)arg);
-    int block = row / MAX_Threads;
-    for (int i = index; i < index + block; i++) {
-        for (int j = 0; j < col; j++) {
-            for (int k = 0; k < row; k++) {
-                matrixC[i][j] += matrixA[i][k] * matrixB[k][j];
-            }
+    for (int j = 0; j < col; j++) {
+        for (int k = 0; k < row; k++) {
+            matrixC[index][j] += matrixA[index][k] * matrixB[k][j];
         }
     }
     free(arg);
@@ -29,11 +25,10 @@ int main() {
     char inFileName[20], outFileName[20];
     struct timeval tp_s, tp_e;
     struct timezone tzp_s, tzp_e;
-    pthread_t th[MAX_Threads];
 
     gettimeofday(&tp_s, &tzp_s);
 
-    for (int c = 1; c <= 1000; c++) {
+    for (int c = 1; c <= 1; c++) {
 
         // name inFileName and outFileName
         sprintf(inFileName, "in/in%d.txt", c);
@@ -48,6 +43,7 @@ int main() {
         // read row and col
         fscanf(inFile, "%d", &row);
         fscanf(inFile, "%d", &col);
+        pthread_t th[row];
 
         printf("%d\n", c);
 
@@ -61,17 +57,16 @@ int main() {
         }
 
         // create 500 threads and calculate matrixC
-        int block = row / MAX_Threads;
-        for (int i = 0; i < MAX_Threads; i++) {
+        for (int i = 0; i < row; i++) {
             int *index = malloc(sizeof(int));
-            *index = i * block;
+            *index = i;
             if (pthread_create(&th[i], NULL, &mul, index) != 0) {
                 perror("Faild to create thread");
             }
         }
 
         // join threads
-        for (int i = 0; i < MAX_Threads; i++) {
+        for (int i = 0; i < row; i++) {
             if (pthread_join(th[i], NULL) != 0) {
                 perror("Faild to join thread");
             } 
